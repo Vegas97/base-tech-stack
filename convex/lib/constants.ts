@@ -58,9 +58,21 @@ export const ENTITY_PERMISSION_PRESETS = {
 
 // Valid tenant IDs (subdomains) - enum for type safety
 export enum ValidTenantId {
+  // Main domain (no subdomain)
+  MAIN = "main",
+  
+  // Portal tenants (share same structure, different data/styling)
   SCUBADIVING = "scubadiving",
   SKYDIVING = "skydiving",
+
+  // Standalone tenants (each has own folder structure with auth)
   ADMIN = "admin",
+  INTEGRATORS = "integrators",
+  VALIDATORS = "validators",
+  TESTERS = "testers",
+
+  // Public standalone tenants (each has own folder structure without auth)
+  STATUS = "status",
 }
 
 // Valid entity names - enum for type safety (matching Convex schema)
@@ -138,22 +150,62 @@ export type { AuditLogAction, AuditCode, AuditCategory } from "./audit_utils";
 // These types are removed as they should be stored in database tables
 // and retrieved dynamically rather than hardcoded
 
+// Tenant types - for routing logic
+export enum TenantType {
+  PORTAL = "portal", // Shared structure, different data/styling
+  STANDALONE = "standalone", // Own folder structure with auth
+  PUBLIC_STANDALONE = "public_standalone", // Own folder structure without auth
+}
+
 // Tenant configuration - type-safe with enum keys
 export const TENANT_CONFIG = {
   [ValidTenantId.SCUBADIVING]: {
     name: "Scuba Diving Portal",
     subdomain: "scubadiving",
     primaryColor: "#0066CC",
+    type: TenantType.PORTAL,
   },
   [ValidTenantId.SKYDIVING]: {
     name: "Skydiving Portal",
     subdomain: "skydiving",
     primaryColor: "#FF6600",
+    type: TenantType.PORTAL,
   },
   [ValidTenantId.ADMIN]: {
     name: "Admin Portal",
     subdomain: "admin",
     primaryColor: "#333333",
+    type: TenantType.STANDALONE,
+  },
+  [ValidTenantId.INTEGRATORS]: {
+    name: "Integrators Portal",
+    subdomain: "integrators",
+    primaryColor: "#4CAF50",
+    type: TenantType.STANDALONE,
+  },
+  [ValidTenantId.VALIDATORS]: {
+    name: "Validators Portal",
+    subdomain: "validators",
+    primaryColor: "#FF9800",
+    type: TenantType.STANDALONE,
+  },
+  [ValidTenantId.TESTERS]: {
+    name: "Testers Portal",
+    subdomain: "testers",
+    primaryColor: "#9C27B0",
+    type: TenantType.STANDALONE,
+  },
+  [ValidTenantId.STATUS]: {
+    name: "Status Page",
+    subdomain: "status",
+    primaryColor: "#10B981",
+    type: TenantType.PUBLIC_STANDALONE,
+  },
+  [ValidTenantId.MAIN]: {
+    name: "Main Site",
+    subdomain: "main",
+    primaryColor: "#6366F1",
+    type: TenantType.PUBLIC_STANDALONE,
   },
 } as const satisfies Record<
   ValidTenantId,
@@ -161,6 +213,7 @@ export const TENANT_CONFIG = {
     name: string;
     subdomain: string;
     primaryColor: string;
+    type: TenantType;
   }
 >;
 
