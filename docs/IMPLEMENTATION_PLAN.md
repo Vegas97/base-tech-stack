@@ -28,11 +28,11 @@ CLERK_JWT_ISSUER_DOMAIN=https://direct-leopard-80.clerk.accounts.dev
 ### 1.3 Clerk Domain Configuration
 Add allowed origins in Clerk Dashboard:
 - `http://localhost:3000` (development)
-- `http://admin.localhost:3000`
-- `http://scubadiving.localhost:3000`
-- `http://skydiving.localhost:3000`
-- `http://auth.localhost:3000`
-- Production domains (when ready)
+- `http://admin.dellavega.local:3000`
+- `http://scubadiving.dellavega.local:3000`
+- `http://skydiving.dellavega.local:3000`
+- `http://auth.dellavega.local:3000`
+- Production domains: `https://admin.dellavega.com`, etc.
 
 ---
 
@@ -41,14 +41,15 @@ Add allowed origins in Clerk Dashboard:
 ### 2.1 Subdomain Simulation Setup
 Edit `/etc/hosts` file:
 ```
-127.0.0.1 admin.localhost
-127.0.0.1 scubadiving.localhost
-127.0.0.1 skydiving.localhost
-127.0.0.1 auth.localhost
+127.0.0.1 dellavega.local
+127.0.0.1 admin.dellavega.local
+127.0.0.1 scubadiving.dellavega.local
+127.0.0.1 skydiving.dellavega.local
+127.0.0.1 auth.dellavega.local
 ```
 
 ### 2.2 Development Testing
-- Access via: `http://admin.localhost:3000`
+- Access via: `http://admin.dellavega.local:3000`
 - Test subdomain detection in middleware
 - Verify Clerk authentication across subdomains
 

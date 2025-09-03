@@ -47,19 +47,19 @@ All subdomains must be added to Clerk's allowed origins:
 **Development:**
 ```
 http://localhost:3000
-http://admin.localhost:3000
-http://scubadiving.localhost:3000
-http://skydiving.localhost:3000
-http://auth.localhost:3000
+http://admin.dellavega.local:3000
+http://scubadiving.dellavega.local:3000
+http://skydiving.dellavega.local:3000
+http://auth.dellavega.local:3000
 ```
 
 **Production:**
 ```
-https://mywebsite.com
-https://admin.mywebsite.com
-https://scubadiving.mywebsite.com
-https://skydiving.mywebsite.com
-https://auth.mywebsite.com
+https://dellavega.com
+https://admin.dellavega.com
+https://scubadiving.dellavega.com
+https://skydiving.dellavega.com
+https://auth.dellavega.com
 ```
 
 ### User Metadata Structure
@@ -157,20 +157,20 @@ export const getProducts = query({
 
 ### 1. Initial Sign-Up Flow
 ```
-User visits: scubadiving.mywebsite.com
+User visits: scubadiving.dellavega.local
 ↓
-Middleware detects no auth → Redirect to auth.mywebsite.com
+Middleware detects no auth → Redirect to auth.dellavega.local
 ↓
 Clerk handles sign-up → Sets tenantAccess: ["scubadiving"]
 ↓
 Convex creates user record with firstTenantId: "scubadiving"
 ↓
-Redirect back to: scubadiving.mywebsite.com
+Redirect back to: scubadiving.dellavega.local
 ```
 
 ### 2. Cross-Tenant Access
 ```
-User visits: skydiving.mywebsite.com (different tenant)
+User visits: skydiving.dellavega.local (different tenant)
 ↓
 Middleware checks JWT → User has access to ["scubadiving"] only
 ↓
@@ -183,7 +183,7 @@ User can now access both portals
 
 ### 3. Admin Portal Access
 ```
-User visits: admin.mywebsite.com
+User visits: admin.dellavega.local
 ↓
 Middleware checks role → Validates SUPER_ADMIN role
 ↓
@@ -196,7 +196,7 @@ If not → Show "Access Denied" page
 
 ## Domain-Specific Logic
 
-### Auth Domain (`auth.mywebsite.com`)
+### Auth Domain (`auth.dellavega.local`)
 **Purpose**: Centralized authentication flows
 - Handles all Clerk sign-in/sign-up components
 - Processes OAuth callbacks
@@ -208,7 +208,7 @@ If not → Show "Access Denied" page
 - Tenant detection from referrer or query params
 - Post-auth redirect logic to original destination
 
-### Portal Domains (`scubadiving.mywebsite.com`, `skydiving.mywebsite.com`)
+### Portal Domains (`scubadiving.dellavega.local`, `skydiving.dellavega.local`)
 **Purpose**: Tenant-specific application interfaces
 - Serve tenant-scoped data and functionality
 - Validate tenant access on every request
@@ -219,7 +219,7 @@ If not → Show "Access Denied" page
 - Appropriate role permissions for requested actions
 - Session management across page refreshes
 
-### Admin Domain (`admin.mywebsite.com`)
+### Admin Domain (`admin.dellavega.local`)
 **Purpose**: System administration and tenant management
 - Cross-tenant data access for SUPER_ADMIN users
 - User and role management interfaces
@@ -256,10 +256,11 @@ If not → Show "Access Denied" page
 ### Local Environment
 Edit `/etc/hosts` for subdomain simulation:
 ```bash
-127.0.0.1 admin.localhost
-127.0.0.1 scubadiving.localhost
-127.0.0.1 skydiving.localhost
-127.0.0.1 auth.localhost
+127.0.0.1 dellavega.local
+127.0.0.1 admin.dellavega.local
+127.0.0.1 scubadiving.dellavega.local
+127.0.0.1 skydiving.dellavega.local
+127.0.0.1 auth.dellavega.local
 ```
 
 ### Environment Variables
@@ -274,8 +275,8 @@ NEXT_PUBLIC_CONVEX_URL=https://your-deployment.convex.cloud
 
 ### Testing Authentication
 1. Start development server: `npm run dev`
-2. Visit: `http://scubadiving.localhost:3000`
-3. Should redirect to: `http://auth.localhost:3000`
+2. Visit: `http://scubadiving.dellavega.local:3000`
+3. Should redirect to: `http://auth.dellavega.local:3000`
 4. Complete sign-up flow
 5. Verify redirect back to original subdomain
 6. Test cross-subdomain navigation
@@ -337,9 +338,9 @@ NEXT_PUBLIC_CONVEX_URL=https://your-deployment.convex.cloud
 
 ### DNS Configuration
 ```
-auth.mywebsite.com     → CNAME to Vercel
-admin.mywebsite.com    → CNAME to Vercel
-*.mywebsite.com        → CNAME to Vercel (wildcard)
+auth.dellavega.com     → CNAME to Vercel
+admin.dellavega.com    → CNAME to Vercel
+*.dellavega.com        → CNAME to Vercel (wildcard)
 ```
 
 ### SSL Certificates
