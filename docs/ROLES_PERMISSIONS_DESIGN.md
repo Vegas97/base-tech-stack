@@ -1,6 +1,7 @@
 # Roles & Permissions System Design
 
 ## Overview
+
 This document defines the complete roles and permissions architecture for the multi-tenant system.
 
 ---
@@ -8,17 +9,21 @@ This document defines the complete roles and permissions architecture for the mu
 ## Permission Types
 
 ### 1. Entity Permissions (CRUD Operations)
+
 Format: `{entity}_{action}`
 
 **Actions:**
+
 - `_create`: Create new records (POST)
-- `_edit`: Update existing records (PUT)  
+- `_edit`: Update existing records (PUT)
 - `_delete`: Delete records (DELETE)
 
 **Grouped Permissions:**
+
 - `{entity}_full_access`: Expands to all 3 actions above
 
 **Examples:**
+
 ```
 products_create
 products_edit
@@ -29,6 +34,7 @@ products_full_access  // = all 3 above
 **Note:** `_fetch` and `_view` are field-level permissions only, not entity-level. If a user has access to at least one field with `_fetch`, they can fetch the entity.
 
 ### 2. Feature Permissions (Business Capabilities)
+
 High-level business features beyond basic CRUD:
 
 ```
@@ -43,14 +49,17 @@ tenant_management
 ```
 
 ### 3. Field-Level Permissions (Column Access)
+
 Granular control over individual database fields:
 
 **Actions:**
+
 - `_fetch`: Can retrieve field in API calls (GET)
 - `_view`: UI display permission (requires `_fetch`)
 - `_update`: Can modify field value (PATCH)
 
 **Defined in schema:**
+
 ```typescript
 interface FieldPermissions {
   [fieldName: string]: {
@@ -83,6 +92,7 @@ internalNotes: {
 ## Role Hierarchy
 
 ### System Roles (Predefined in Convex):
+
 Predefined roles that cannot be deleted:
 
 ```typescript
@@ -93,87 +103,55 @@ const SYSTEM_ROLES = {
     entityPermissions: ["*"],
     featurePermissions: ["*"],
     tenantScope: null, // Global access
-    isSystemRole: true
+    isSystemRole: true,
   },
-  
+
   PORTAL_SCUBADIVING_ADMIN: {
     name: "PORTAL_SCUBADIVING_ADMIN",
     displayName: "Scuba Diving Portal Administrator",
-    entityPermissions: [
-      "products_full_access",
-      "orders_full_access", 
-      "reviews_edit",
-      "reviews_delete",
-      "users_view",
-      "users_edit"
-    ],
+    entityPermissions: ["products_full_access", "users_view", "users_edit"],
     featurePermissions: [
       "analytics_dashboard",
       "bulk_import",
-      "manage_promotions"
+      "manage_promotions",
     ],
     tenantScope: "scubadiving",
-    isSystemRole: true
+    isSystemRole: true,
   },
-  
+
   PORTAL_SCUBADIVING_USER: {
     name: "PORTAL_SCUBADIVING_USER",
     displayName: "Scuba Diving Customer",
-    entityPermissions: [
-      "products_view",
-      "orders_create",
-      "orders_view", // Own orders only
-      "reviews_create",
-      "reviews_edit" // Own reviews only
-    ],
-    featurePermissions: [
-      "advanced_search"
-    ],
+    entityPermissions: ["products_view"],
+    featurePermissions: ["advanced_search"],
     tenantScope: "scubadiving",
-    isSystemRole: true
+    isSystemRole: true,
   },
-  
+
   PORTAL_SKYDIVING_ADMIN: {
     name: "PORTAL_SKYDIVING_ADMIN",
     displayName: "Sky Diving Portal Administrator",
-    entityPermissions: [
-      "products_full_access",
-      "orders_full_access",
-      "reviews_full_access",
-      "users_view",
-      "users_edit"
-    ],
-    featurePermissions: [
-      "analytics_dashboard",
-      "bulk_import",
-      "export_data"
-    ],
+    entityPermissions: ["products_full_access", "users_view", "users_edit"],
+    featurePermissions: ["analytics_dashboard", "bulk_import", "export_data"],
     tenantScope: "skydiving",
-    isSystemRole: true
+    isSystemRole: true,
   },
-  
+
   PORTAL_SKYDIVING_USER: {
-    name: "PORTAL_SKYDIVING_USER", 
+    name: "PORTAL_SKYDIVING_USER",
     displayName: "Sky Diving Customer",
-    entityPermissions: [
-      "products_view",
-      "orders_create",
-      "orders_view",
-      "reviews_create",
-      "reviews_edit"
-    ],
-    featurePermissions: [
-      "advanced_search"
-    ],
+    entityPermissions: ["products_view"],
+    featurePermissions: ["advanced_search"],
     tenantScope: "skydiving",
-    isSystemRole: true
-  }
+    isSystemRole: true,
+  },
 };
 ```
 
 ## Database Schema
 
 ### Unified Roles Table
+
 Both system and custom roles use the same entity structure:
 
 ```typescript
@@ -183,37 +161,41 @@ interface Role {
   displayName: string;
   isSystemRole: boolean; // true for system roles, false for custom roles
   inheritsFrom: string | null; // null for standalone roles, roleId for inherited roles
-  
+
   // Base permissions (for system roles or standalone custom roles)
   entityPermissions: string[]; // ["products_create", "products_edit", ...]
   featurePermissions: string[]; // ["analytics_dashboard", "bulk_import", ...]
-  
+
   // Override permissions (for inherited custom roles)
   addedEntityPermissions: string[]; // Additional entity permissions
   removedEntityPermissions: string[]; // Removed entity permissions
   addedFeaturePermissions: string[]; // Additional feature permissions
   removedFeaturePermissions: string[]; // Removed feature permissions
   customPermissions: string[]; // Super custom for testing/debugging
-  
+
   tenantScope: string | null; // null for global, specific tenant for others
 }
 ```
 
 **Role Types:**
+
 - **System Roles**: `isSystemRole: true`, `inheritsFrom: null` (standalone base roles)
 - **Inherited Custom Roles**: `isSystemRole: false`, `inheritsFrom: roleId` (extends existing role)
 - **Standalone Custom Roles**: `isSystemRole: false`, `inheritsFrom: null` (completely independent)
 
 **Use Cases for Standalone Custom Roles (`inheritsFrom: null`):**
+
 - **Temporary Roles**: Event-specific permissions
 - **External Integrations**: API-only roles with specific permission sets
 - **Testing Roles**: Isolated permission combinations for debugging
 - **Special Projects**: One-off permission combinations that don't fit existing roles
 
 ### Custom Roles (User-Created):
+
 Inherit from system roles with add/remove permissions OR create standalone roles:
 
 **Example - Inherited Custom Role (Marketing - Add permissions):**
+
 ```typescript
 {
   id: "custom_marketing_001",
@@ -237,6 +219,7 @@ Inherit from system roles with add/remove permissions OR create standalone roles
 ```
 
 **Example - Inherited Custom Role (Restricted Admin - Remove permissions):**
+
 ```typescript
 {
   id: "custom_restricted_admin_001",
@@ -261,6 +244,7 @@ Inherit from system roles with add/remove permissions OR create standalone roles
 ```
 
 **Example - Standalone Custom Role (Independent permissions):**
+
 ```typescript
 {
   id: "custom_api_integration_001",
@@ -268,7 +252,7 @@ Inherit from system roles with add/remove permissions OR create standalone roles
   displayName: "External API Integration",
   isSystemRole: false,
   inheritsFrom: null, // Completely independent
-  entityPermissions: ["products_view", "orders_create"], // Only specific permissions
+  entityPermissions: ["products_view"], // Only specific permissions
   featurePermissions: ["api_access"], // API-specific features
   addedEntityPermissions: [], // Not used for standalone roles
   removedEntityPermissions: [], // Not used for standalone roles
@@ -284,40 +268,45 @@ Inherit from system roles with add/remove permissions OR create standalone roles
 ## Permission Resolution Logic
 
 ### Priority Order:
+
 1. **Base Role Permissions** (from assigned roles)
 2. **+ Granted Overrides** (additional permissions)
 3. **- Revoked Overrides** (removed permissions)
 4. **Wildcard Resolution** (`*` and `_full_access` expansion)
 
 ### Permission Checking Flow:
+
 ```typescript
 async function hasPermission(userId, permission, tenantId, resourceId?) {
   // 1. Get user's effective permissions (cached)
   const userPerms = await getUserEffectivePermissions(userId, tenantId);
-  
+
   // 2. Check entity/feature permission
-  const hasEntityPerm = userPerms.entityPermissions.includes(permission) || 
-                       userPerms.entityPermissions.includes("*");
-  const hasFeaturePerm = userPerms.featurePermissions.includes(permission) || 
-                        userPerms.featurePermissions.includes("*");
-  
+  const hasEntityPerm =
+    userPerms.entityPermissions.includes(permission) ||
+    userPerms.entityPermissions.includes("*");
+  const hasFeaturePerm =
+    userPerms.featurePermissions.includes(permission) ||
+    userPerms.featurePermissions.includes("*");
+
   const hasAccess = hasEntityPerm || hasFeaturePerm;
-  
+
   // 3. Row-level security check (if resourceId provided)
   if (hasAccess && resourceId) {
     return await checkRowLevelAccess(userId, permission, resourceId, tenantId);
   }
-  
+
   return hasAccess;
 }
 ```
 
 ### Grouped Permission Expansion:
+
 ```typescript
 function resolvePermissions(permissions: string[]): string[] {
   const resolved = new Set<string>();
-  
-  permissions.forEach(permission => {
+
+  permissions.forEach((permission) => {
     if (permission === "*") {
       // Add all possible permissions
       resolved.add("*");
@@ -332,7 +321,7 @@ function resolvePermissions(permissions: string[]): string[] {
       resolved.add(permission);
     }
   });
-  
+
   return Array.from(resolved);
 }
 ```
@@ -342,6 +331,7 @@ function resolvePermissions(permissions: string[]): string[] {
 ## JWT Claims Structure
 
 ### Current Clerk JWT Template:
+
 ```json
 {
   "aud": "convex",
@@ -359,10 +349,12 @@ function resolvePermissions(permissions: string[]): string[] {
 ```
 
 ### Simplified JWT Claims (Add to template):
+
 - **`roleIds`**: Array of role names `["PORTAL_SCUBADIVING_ADMIN", "PORTAL_SKYDIVING_USER"]`
 - **`tenantAccess`**: Array of tenant domains `["scubadiving", "skydiving"]`
 
 ### Updated JWT Template:
+
 ```json
 {
   "aud": "convex",
@@ -384,11 +376,13 @@ function resolvePermissions(permissions: string[]): string[] {
 ### Claim Purposes:
 
 **tenantAccess:**
+
 - Fast tenant access validation
 - UI: Portal switching options
 - Middleware: Subdomain access control
 
 **roleIds:**
+
 - Direct Convex role lookup (e.g., "PORTAL_SCUBADIVING_ADMIN")
 - Avoid user queries in every request
 - Permission cache keys
@@ -398,12 +392,14 @@ function resolvePermissions(permissions: string[]): string[] {
 ## Data Storage Strategy
 
 ### Clerk Stores:
+
 - Basic auth data (email, password, MFA)
 - User metadata (name, profile info)
 - **Tenant access list** (via `publicMetadata.tenantIds`)
 - **Role IDs** (via `publicMetadata.roleIds`)
 
 ### Convex Stores:
+
 - **Detailed role definitions** (permissions, scope)
 - **User role assignments** (user-role-tenant mappings)
 - **Permission overrides** (user-specific grants/revokes)
@@ -416,19 +412,26 @@ function resolvePermissions(permissions: string[]): string[] {
 ## Row-Level Security
 
 ### Ownership-Based Access:
+
 ```typescript
 // Users can only access their own orders
 async function checkRowLevelAccess(userId, permission, resourceId, tenantId) {
   if (permission.startsWith("orders_")) {
     const order = await db.get(resourceId);
-    return order?.userId === userId || hasPermission(userId, "orders_full_access", tenantId);
+    return (
+      order?.userId === userId ||
+      hasPermission(userId, "orders_full_access", tenantId)
+    );
   }
-  
+
   if (permission.startsWith("reviews_")) {
     const review = await db.get(resourceId);
-    return review?.userId === userId || hasPermission(userId, "reviews_full_access", tenantId);
+    return (
+      review?.userId === userId ||
+      hasPermission(userId, "reviews_full_access", tenantId)
+    );
   }
-  
+
   return true; // Default allow for other resources
 }
 ```
@@ -438,6 +441,7 @@ async function checkRowLevelAccess(userId, permission, resourceId, tenantId) {
 ## Permission Override System
 
 ### Temporary Permissions:
+
 ```typescript
 // Grant temporary access
 {
@@ -451,11 +455,12 @@ async function checkRowLevelAccess(userId, permission, resourceId, tenantId) {
 ```
 
 ### Permission Revocation:
+
 ```typescript
 // Remove specific permission from user's role
 {
   userId: "user_789",
-  tenantId: "scubadiving", 
+  tenantId: "scubadiving",
   revokedEntityPermissions: ["products_delete"],
   reason: "Security incident - removing delete permissions",
   grantedBy: "admin_user_456"
@@ -467,18 +472,21 @@ async function checkRowLevelAccess(userId, permission, resourceId, tenantId) {
 ## Implementation Notes
 
 ### Performance Considerations:
+
 - **Permission caching**: Pre-compute effective permissions
 - **JWT claims**: Include frequently-checked permissions
 - **Database indexes**: Efficient tenant and user filtering
 - **Cache invalidation**: Update when permissions change
 
 ### Security Considerations:
+
 - **Tenant isolation**: All queries filtered by tenantId
 - **Permission validation**: Every operation checked
 - **Audit logging**: Track all permission changes
 - **Field-level security**: Column access control
 
 ### UI Adaptation:
+
 - **Dynamic forms**: Show only editable fields
 - **Dynamic tables**: Display only viewable columns
 - **Feature gates**: Hide unavailable features
@@ -489,17 +497,20 @@ async function checkRowLevelAccess(userId, permission, resourceId, tenantId) {
 ## Example Scenarios
 
 ### Scenario 1: Regular Customer
+
 **User:** Sarah (Scuba diving customer)  
 **Role:** `PORTAL_SCUBADIVING_USER`  
 **Tenant Access:** `["scubadiving"]`
 
 **Permissions:**
+
 - Can view scuba diving products (but not cost fields)
 - Can create bookings for herself
 - Cannot access admin features
 - Cannot see internal pricing data
 
 **JWT Claims:**
+
 ```json
 {
   "roleIds": ["PORTAL_SCUBADIVING_USER"],
@@ -508,6 +519,7 @@ async function checkRowLevelAccess(userId, permission, resourceId, tenantId) {
 ```
 
 **Real Data Example:**
+
 ```json
 {
   "aud": "convex",
@@ -527,17 +539,20 @@ async function checkRowLevelAccess(userId, permission, resourceId, tenantId) {
 ```
 
 ### Scenario 2: Multi-Portal Admin
+
 **User:** Mike (Operations manager)  
 **Roles:** `PORTAL_SCUBADIVING_ADMIN`, `PORTAL_SKYDIVING_ADMIN`  
 **Tenant Access:** `["scubadiving", "skydiving"]`
 
 **Permissions:**
+
 - Full access to both portals
 - Can manage users and products
 - Can view all financial data including costs
 - Cannot access super admin features
 
 **JWT Claims:**
+
 ```json
 {
   "roleIds": ["PORTAL_SCUBADIVING_ADMIN", "PORTAL_SKYDIVING_ADMIN"],
@@ -546,6 +561,7 @@ async function checkRowLevelAccess(userId, permission, resourceId, tenantId) {
 ```
 
 **Real Data Example:**
+
 ```json
 {
   "aud": "convex",
@@ -565,16 +581,19 @@ async function checkRowLevelAccess(userId, permission, resourceId, tenantId) {
 ```
 
 ### Scenario 3: Mixed Role User
+
 **User:** Carlos (Operations manager)  
 **Roles:** Admin in scubadiving, User in skydiving  
 **Tenant Access:** `["scubadiving", "skydiving"]`
 
 **Permissions:**
+
 - Full admin access in scubadiving portal
 - Basic user access in skydiving portal
 - Cannot cross-manage between portals
 
 **JWT Claims:**
+
 ```json
 {
   "roleIds": ["PORTAL_SCUBADIVING_ADMIN", "PORTAL_SKYDIVING_USER"],
@@ -583,6 +602,7 @@ async function checkRowLevelAccess(userId, permission, resourceId, tenantId) {
 ```
 
 **Real Data Example:**
+
 ```json
 {
   "aud": "convex",
@@ -602,24 +622,32 @@ async function checkRowLevelAccess(userId, permission, resourceId, tenantId) {
 ```
 
 ### Scenario 4: Multi-Portal User with Super Admin
+
 **User:** Emma (Regular user + System admin)  
 **Roles:** User in both portals + Super Admin  
 **Tenant Access:** `["*"]` (super admin overrides)
 
 **Permissions:**
+
 - Basic user access in both portals
 - Full system admin capabilities
 - Can manage all tenants and system settings
 
 **JWT Claims:**
+
 ```json
 {
-  "roleIds": ["PORTAL_SCUBADIVING_USER", "PORTAL_SKYDIVING_USER", "SUPER_ADMIN"],
+  "roleIds": [
+    "PORTAL_SCUBADIVING_USER",
+    "PORTAL_SKYDIVING_USER",
+    "SUPER_ADMIN"
+  ],
   "tenantIds": ["*"]
 }
 ```
 
 **Real Data Example:**
+
 ```json
 {
   "aud": "convex",
@@ -633,23 +661,30 @@ async function checkRowLevelAccess(userId, permission, resourceId, tenantId) {
   "phone_number": "+1777888999",
   "email_verified": true,
   "phone_number_verified": true,
-  "roleIds": ["PORTAL_SCUBADIVING_USER", "PORTAL_SKYDIVING_USER", "SUPER_ADMIN"],
+  "roleIds": [
+    "PORTAL_SCUBADIVING_USER",
+    "PORTAL_SKYDIVING_USER",
+    "SUPER_ADMIN"
+  ],
   "tenantIds": ["*"]
 }
 ```
 
 ### Scenario 5: Super Admin Only
+
 **User:** Alex (System administrator)  
 **Role:** `SUPER_ADMIN`  
 **Tenant Access:** `["*"]` (all tenants)
 
 **Permissions:**
+
 - Access to all portals and admin interface
 - Can create new tenants
 - Can manage system-wide settings
 - Full access to all data and features
 
 **JWT Claims:**
+
 ```json
 {
   "roleIds": ["SUPER_ADMIN"],
@@ -658,6 +693,7 @@ async function checkRowLevelAccess(userId, permission, resourceId, tenantId) {
 ```
 
 **Real Data Example:**
+
 ```json
 {
   "aud": "convex",
@@ -681,31 +717,32 @@ async function checkRowLevelAccess(userId, permission, resourceId, tenantId) {
 ## HTTP Method Examples with Entity & Field Mapping
 
 ### Entity Schema with Permissions
+
 ```typescript
 interface ProductEntity {
   // Entity-level permissions
   entityPermissions: {
     [tenantId: string]: EntityAction[];
   };
-  
+
   // Field-level permissions
   fieldPermissions: {
     name: {
       [tenantId: string]: FieldAction[];
     };
     price: {
-      admin: ["_fetch", "_view", "_update"],
-      scubadiving: ["_fetch", "_view"], // Can see but not edit
-      skydiving: [] // No access
+      admin: ["_fetch", "_view", "_update"];
+      scubadiving: ["_fetch", "_view"]; // Can see but not edit
+      skydiving: []; // No access
     };
     cost: {
-      admin: ["_fetch", "_view", "_update"],
+      admin: ["_fetch", "_view", "_update"];
       // Missing tenants = no access (internal data)
     };
     description: {
-      admin: ["_fetch", "_view", "_update"],
-      scubadiving: ["_fetch", "_view", "_update"],
-      skydiving: ["_fetch", "_view", "_update"]
+      admin: ["_fetch", "_view", "_update"];
+      scubadiving: ["_fetch", "_view", "_update"];
+      skydiving: ["_fetch", "_view", "_update"];
     };
   };
 }
@@ -717,17 +754,21 @@ type FieldAction = "_fetch" | "_view" | "_update";
 ### API Call Examples
 
 #### 1. GET /api/products (Sarah - PORTAL_SCUBADIVING_USER)
+
 **Request:**
+
 ```http
 GET /api/products?tenantId=scubadiving
 Authorization: Bearer <jwt_with_PORTAL_SCUBADIVING_USER>
 ```
 
 **Permission Check:**
+
 - Entity: Check if user has any field with `_fetch` permission
 - Fields: Return only fields with `_fetch` permission for scubadiving tenant
 
 **Response:**
+
 ```json
 {
   "products": [
@@ -743,17 +784,21 @@ Authorization: Bearer <jwt_with_PORTAL_SCUBADIVING_USER>
 ```
 
 #### 2. GET /api/products (Mike - PORTAL_SCUBADIVING_ADMIN)
+
 **Request:**
+
 ```http
 GET /api/products?tenantId=scubadiving
 Authorization: Bearer <jwt_with_PORTAL_SCUBADIVING_ADMIN>
 ```
 
 **Permission Check:**
+
 - Entity: Admin has `products_full_access` → includes all entity actions
 - Fields: Admin role has access to all fields including cost
 
 **Response:**
+
 ```json
 {
   "products": [
@@ -761,7 +806,7 @@ Authorization: Bearer <jwt_with_PORTAL_SCUBADIVING_ADMIN>
       "id": "prod_001",
       "name": "Diving Mask",
       "price": 89.99,
-      "cost": 45.50,
+      "cost": 45.5,
       "description": "Professional diving mask"
     }
   ]
@@ -769,7 +814,9 @@ Authorization: Bearer <jwt_with_PORTAL_SCUBADIVING_ADMIN>
 ```
 
 #### 3. POST /api/products (Sarah - PORTAL_SCUBADIVING_USER)
+
 **Request:**
+
 ```http
 POST /api/products
 Authorization: Bearer <jwt_with_PORTAL_SCUBADIVING_USER>
@@ -783,9 +830,11 @@ Content-Type: application/json
 ```
 
 **Permission Check:**
+
 - Entity: Check `products_create` permission → DENIED (user role doesn't have create)
 
 **Response:**
+
 ```json
 {
   "error": "Insufficient permissions",
@@ -795,7 +844,9 @@ Content-Type: application/json
 ```
 
 #### 4. POST /api/products (Mike - PORTAL_SCUBADIVING_ADMIN)
+
 **Request:**
+
 ```http
 POST /api/products
 Authorization: Bearer <jwt_with_PORTAL_SCUBADIVING_ADMIN>
@@ -810,23 +861,27 @@ Content-Type: application/json
 ```
 
 **Permission Check:**
+
 - Entity: Admin has `products_create` → ALLOWED
 - Fields: All fields have `_update` permission for admin
 
 **Response:**
+
 ```json
 {
   "id": "prod_002",
   "name": "New Diving Gear",
   "price": 199.99,
-  "cost": 89.50,
+  "cost": 89.5,
   "description": "Advanced diving equipment",
   "createdAt": "2024-01-15T10:30:00Z"
 }
 ```
 
 #### 5. PATCH /api/products/prod_001 (Sarah - PORTAL_SCUBADIVING_USER)
+
 **Request:**
+
 ```http
 PATCH /api/products/prod_001
 Authorization: Bearer <jwt_with_PORTAL_SCUBADIVING_USER>
@@ -838,19 +893,23 @@ Content-Type: application/json
 ```
 
 **Permission Check:**
+
 - Entity: Check `products_edit` permission → DENIED (user role doesn't have edit)
 
 **Response:**
+
 ```json
 {
   "error": "Insufficient permissions",
-  "code": "PERMISSION_DENIED", 
+  "code": "PERMISSION_DENIED",
   "required": "products_edit"
 }
 ```
 
 #### 6. PATCH /api/products/prod_001 (Carlos - Mixed Roles)
+
 **Request to Scubadiving (Admin access):**
+
 ```http
 PATCH /api/products/prod_001?tenantId=scubadiving
 Authorization: Bearer <jwt_with_mixed_roles>
@@ -863,23 +922,26 @@ Content-Type: application/json
 ```
 
 **Permission Check:**
+
 - Tenant: scubadiving → User has PORTAL_SCUBADIVING_ADMIN role
 - Entity: Admin has `products_edit` → ALLOWED
 - Fields: price and cost both have `_update` permission for admin
 
 **Response:**
+
 ```json
 {
   "id": "prod_001",
   "name": "Diving Mask",
   "price": 95.99,
-  "cost": 47.00,
+  "cost": 47.0,
   "description": "Professional diving mask",
   "updatedAt": "2024-01-15T11:45:00Z"
 }
 ```
 
 **Request to Skydiving (User access):**
+
 ```http
 PATCH /api/products/prod_sky_001?tenantId=skydiving
 Authorization: Bearer <jwt_with_mixed_roles>
@@ -891,10 +953,12 @@ Content-Type: application/json
 ```
 
 **Permission Check:**
+
 - Tenant: skydiving → User has PORTAL_SKYDIVING_USER role
 - Entity: User role doesn't have `products_edit` → DENIED
 
 **Response:**
+
 ```json
 {
   "error": "Insufficient permissions",
@@ -904,17 +968,21 @@ Content-Type: application/json
 ```
 
 #### 7. DELETE /api/products/prod_001 (Emma - Super Admin)
+
 **Request:**
+
 ```http
 DELETE /api/products/prod_001?tenantId=scubadiving
 Authorization: Bearer <jwt_with_super_admin>
 ```
 
 **Permission Check:**
+
 - Role: SUPER_ADMIN has `*` permissions → ALLOWED for all operations
 - Tenant: `*` access overrides specific tenant restrictions
 
 **Response:**
+
 ```json
 {
   "message": "Product deleted successfully",
@@ -924,9 +992,11 @@ Authorization: Bearer <jwt_with_super_admin>
 ```
 
 #### 8. Field-Level Filtering Example
+
 **GET /api/products with different users:**
 
 **Sarah (PORTAL_SCUBADIVING_USER):**
+
 ```json
 {
   "id": "prod_001",
@@ -938,18 +1008,20 @@ Authorization: Bearer <jwt_with_super_admin>
 ```
 
 **Mike (PORTAL_SCUBADIVING_ADMIN):**
+
 ```json
 {
-  "id": "prod_001", 
+  "id": "prod_001",
   "name": "Diving Mask",
   "price": 89.99,
-  "cost": 45.50,
+  "cost": 45.5,
   "description": "Professional diving mask"
   // All fields included - admin has full access
 }
 ```
 
 **Carlos accessing Skydiving tenant (PORTAL_SKYDIVING_USER):**
+
 ```json
 {
   "id": "prod_sky_001",

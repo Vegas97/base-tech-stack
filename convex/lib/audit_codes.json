@@ -1,0 +1,160 @@
+{
+  "categories": {
+    "AUTHENTICATION": {
+      "prefix": "A00",
+      "description": "Authentication and session management",
+      "actions": {
+        "A0001": "login",
+        "A0002": "logout", 
+        "A0003": "signup",
+        "A0004": "password_reset",
+        "A0005": "password_changed",
+        "A0006": "mfa_enabled",
+        "A0007": "mfa_disabled",
+        "A0008": "session_expired",
+        "A0009": "account_locked",
+        "A0010": "account_unlocked"
+      }
+    },
+    "USER_MANAGEMENT": {
+      "prefix": "A01",
+      "description": "User lifecycle and profile management",
+      "actions": {
+        "A0101": "user_created",
+        "A0102": "user_updated", 
+        "A0103": "user_deleted",
+        "A0104": "user_activated",
+        "A0105": "user_deactivated",
+        "A0106": "user_profile_viewed",
+        "A0107": "user_email_verified",
+        "A0108": "user_phone_verified"
+      }
+    },
+    "ROLE_MANAGEMENT": {
+      "prefix": "A02",
+      "description": "Role and permission management",
+      "actions": {
+        "A0201": "role_assigned",
+        "A0202": "role_removed",
+        "A0203": "role_created",
+        "A0204": "role_updated",
+        "A0205": "role_deleted",
+        "A0206": "permission_granted",
+        "A0207": "permission_revoked",
+        "A0208": "custom_role_created",
+        "A0209": "custom_role_modified"
+      }
+    },
+    "TENANT_MANAGEMENT": {
+      "prefix": "A03",
+      "description": "Tenant and multi-tenancy operations",
+      "actions": {
+        "A0301": "tenant_created",
+        "A0302": "tenant_updated",
+        "A0303": "tenant_deleted",
+        "A0304": "tenant_accessed",
+        "A0305": "tenant_switched",
+        "A0306": "tenant_settings_changed",
+        "A0307": "tenant_user_invited",
+        "A0308": "tenant_user_removed"
+      }
+    },
+    "DATA_ACCESS": {
+      "prefix": "A04",
+      "description": "Data access and viewing operations",
+      "actions": {
+        "A0401": "data_accessed",
+        "A0402": "data_exported",
+        "A0403": "data_imported",
+        "A0404": "bulk_operation_performed",
+        "A0405": "search_performed",
+        "A0406": "report_generated",
+        "A0407": "analytics_viewed",
+        "A0408": "sensitive_data_accessed"
+      }
+    },
+    "DATA_MODIFICATION": {
+      "prefix": "A05",
+      "description": "Data creation, update, and deletion",
+      "actions": {
+        "A0501": "data_created",
+        "A0502": "data_updated",
+        "A0503": "data_deleted",
+        "A0504": "bulk_update_performed",
+        "A0505": "bulk_delete_performed",
+        "A0506": "data_restored",
+        "A0507": "data_archived",
+        "A0508": "data_purged"
+      }
+    },
+    "SYSTEM_ADMINISTRATION": {
+      "prefix": "A06",
+      "description": "System settings and administration",
+      "actions": {
+        "A0601": "system_settings_changed",
+        "A0602": "backup_created",
+        "A0603": "backup_restored",
+        "A0604": "system_maintenance_started",
+        "A0605": "system_maintenance_completed",
+        "A0606": "webhook_configured",
+        "A0607": "integration_enabled",
+        "A0608": "integration_disabled"
+      }
+    },
+    "SECURITY": {
+      "prefix": "A07",
+      "description": "Security events and violations",
+      "actions": {
+        "A0701": "unauthorized_access_attempt",
+        "A0702": "permission_violation",
+        "A0703": "suspicious_activity_detected",
+        "A0704": "security_policy_violation",
+        "A0705": "data_breach_detected",
+        "A0706": "audit_log_accessed",
+        "A0707": "security_settings_changed",
+        "A0708": "failed_login_attempt"
+      }
+    }
+  },
+  "entity_mappings": {
+    "products": {
+      "create": "A0501",
+      "edit": "A0502", 
+      "delete": "A0503",
+      "access": "A0401"
+    },
+    "users": {
+      "create": "A0101",
+      "edit": "A0102",
+      "delete": "A0103", 
+      "access": "A0106"
+    },
+    "tenants": {
+      "create": "A0301",
+      "edit": "A0302",
+      "delete": "A0303",
+      "access": "A0304"
+    },
+    "roles": {
+      "create": "A0203",
+      "edit": "A0204",
+      "delete": "A0205",
+      "access": "A0401"
+    }
+  },
+  "feature_mappings": {
+    "analytics_dashboard": "A0407",
+    "bulk_import": "A0403",
+    "advanced_search": "A0405",
+    "user_management": "A0101",
+    "tenant_management": "A0301",
+    "role_management": "A0201",
+    "permission_management": "A0206",
+    "audit_logs": "A0706",
+    "system_settings": "A0601",
+    "backup_restore": "A0602",
+    "api_access": "A0401",
+    "webhook_management": "A0606",
+    "integration_management": "A0607"
+  }
+}
