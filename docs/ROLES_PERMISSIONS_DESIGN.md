@@ -359,8 +359,8 @@ function resolvePermissions(permissions: string[]): string[] {
 ```
 
 ### Simplified JWT Claims (Add to template):
-- **`roleIds`**: Array of role names `["PORTAL_SCUBADIVING_USER", "PORTAL_SKYDIVING_ADMIN"]`
-- **`tenantIds`**: Array of tenant domains `["scubadiving", "skydiving"]`
+- **`roleIds`**: Array of role names `["PORTAL_SCUBADIVING_ADMIN", "PORTAL_SKYDIVING_USER"]`
+- **`tenantAccess`**: Array of tenant domains `["scubadiving", "skydiving"]`
 
 ### Updated JWT Template:
 ```json
@@ -376,20 +376,20 @@ function resolvePermissions(permissions: string[]): string[] {
   "phone_number": "{{user.primary_phone_number}}",
   "email_verified": "{{user.email_verified}}",
   "phone_number_verified": "{{user.phone_number_verified}}",
-  "roleIds": "{{user.public_metadata.roleIds}}",
-  "tenantIds": "{{user.public_metadata.tenantIds}}"
+  "roleIds": "{{user.private_metadata.roleIds}}",
+  "tenantAccess": "{{user.private_metadata.tenantAccess}}"
 }
 ```
 
 ### Claim Purposes:
 
-**tenantIds:**
+**tenantAccess:**
 - Fast tenant access validation
 - UI: Portal switching options
 - Middleware: Subdomain access control
 
 **roleIds:**
-- Direct Convex role lookup
+- Direct Convex role lookup (e.g., "PORTAL_SCUBADIVING_ADMIN")
 - Avoid user queries in every request
 - Permission cache keys
 

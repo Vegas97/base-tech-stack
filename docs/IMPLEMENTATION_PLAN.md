@@ -16,7 +16,6 @@ Complete implementation plan for building a multi-tenant SaaS architecture with 
 ### 1.1 Update Existing JWT Template
 - Keep existing working `convex` JWT template in Clerk Dashboard
 - Add additional claims to existing template:
-  - `globalRole`: `{{user.private_metadata.globalRole}}`
   - `tenantAccess`: `{{user.private_metadata.tenantAccess}}`
   - `roleIds`: `{{user.private_metadata.roleIds}}`
 
@@ -71,7 +70,6 @@ users: defineTable({
   email: v.string(), // For display/communication only
   firstTenantId: v.string(), // Portal where user first signed up
   accessibleTenants: v.array(v.string()), // ["scubadiving", "skydiving"]
-  globalRole: v.union(v.literal("user"), v.literal("admin"), v.literal("super_admin")),
   createdAt: v.number(),
   lastActiveAt: v.number(),
 }).index("by_clerk_user_id", ["clerkUserId"]),
@@ -110,7 +108,7 @@ roles: defineTable({
   removedFeaturePermissions: v.array(v.string()), // Removed feature permissions
   customPermissions: v.array(v.string()), // Super custom for testing/debugging
   
-  tenantScope: v.optional(v.string()), // null for global, "scubadiving" for tenant-specific
+  tenantScope: v.optional(v.string()), // null for SUPER_ADMIN, "scubadiving" for tenant-specific
 }),
 ```
 
@@ -122,7 +120,7 @@ features: defineTable({
   description: v.string(),
   category: v.string(), // "analytics", "management", "export"
   isActive: v.boolean(),
-  tenantScope: v.optional(v.string()), // null for global, tenantId for tenant-specific
+  tenantScope: v.optional(v.string()), // null for SUPER_ADMIN, tenantId for tenant-specific
 }),
 ```
 
@@ -131,7 +129,7 @@ features: defineTable({
 userRoles: defineTable({
   userId: v.id("users"),
   roleId: v.id("roles"),
-  tenantId: v.optional(v.string()), // null for global roles
+  tenantId: v.optional(v.string()), // null for SUPER_ADMIN, specific tenant for others
   grantedAt: v.number(),
   grantedBy: v.id("users"),
 }),
