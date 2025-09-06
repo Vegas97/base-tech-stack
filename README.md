@@ -34,3 +34,23 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## useful comands
+
+# run convex dev, watch for changes and update the database live
+
+```bash
+pnpm dlx convex dev
+```
+
+# run convex dev --once, run once and exit
+
+```bash
+pnpm dlx convex dev --once
+```
+
+# typescript typecheck
+
+```bash
+pnpm exec tsc --noEmit
+```
