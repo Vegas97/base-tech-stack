@@ -54,6 +54,15 @@ const publicTenants = Object.entries(TENANT_CONFIG)
     color: config.primaryColor,
   }));
 
+const apiTenants = Object.entries(TENANT_CONFIG)
+  .filter(([_, config]) => config.type === TenantType.API_ONLY)
+  .map(([tenantId, config]) => ({
+    title: config.name,
+    url: createUrl(config.subdomain),
+    subdomain: config.subdomain,
+    color: config.primaryColor,
+  }));
+
 // main tenant, get it from  publicTenants where  config.subdomain === "main",
 //  if returns an array pick teh first object
 const mainTenant = publicTenants.find((tenant) => tenant.title === "Main Site");
@@ -71,6 +80,10 @@ const data = {
     {
       title: "Public",
       items: publicTenants,
+    },
+    {
+      title: "APIs",
+      items: apiTenants,
     },
   ],
 };

@@ -94,6 +94,15 @@ export default clerkMiddleware((auth, req: NextRequest) => {
           );
           return NextResponse.rewrite(url);
         }
+      } else if (tenantConfig.type === TenantType.API_ONLY) {
+        // API-only tenants (api, external-api) - route to /api/{tenantId}
+        if (!url.pathname.startsWith(`/api/${tenantId}`)) {
+          url.pathname = `/api/${tenantId}${url.pathname}`;
+          console.log(
+            `[Middleware] Rewriting API tenant ${tenantId} to: ${url.pathname}`
+          );
+          return NextResponse.rewrite(url);
+        }
       }
     }
   }

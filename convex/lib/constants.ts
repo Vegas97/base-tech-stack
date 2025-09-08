@@ -73,6 +73,10 @@ export enum ValidTenantId {
 
   // Public standalone tenants (each has own folder structure without auth)
   STATUS = "status",
+
+  // API-only tenants (API routes only, no UI pages)
+  API = "api",
+  EXTERNAL_API = "external-api",
 }
 
 // Valid entity names - enum for type safety (matching Convex schema)
@@ -155,6 +159,7 @@ export enum TenantType {
   PORTAL = "portal", // Shared structure, different data/styling
   STANDALONE = "standalone", // Own folder structure with auth
   PUBLIC_STANDALONE = "public_standalone", // Own folder structure without auth
+  API_ONLY = "api_only", // API routes only, no UI pages
 }
 
 // Tenant configuration - type-safe with enum keys
@@ -206,6 +211,18 @@ export const TENANT_CONFIG = {
     subdomain: "main",
     primaryColor: "#6366F1",
     type: TenantType.PUBLIC_STANDALONE,
+  },
+  [ValidTenantId.API]: {
+    name: "API Services",
+    subdomain: "api",
+    primaryColor: "#059669",
+    type: TenantType.API_ONLY,
+  },
+  [ValidTenantId.EXTERNAL_API]: {
+    name: "External API Services",
+    subdomain: "external-api",
+    primaryColor: "#DC2626",
+    type: TenantType.API_ONLY,
   },
 } as const satisfies Record<
   ValidTenantId,
