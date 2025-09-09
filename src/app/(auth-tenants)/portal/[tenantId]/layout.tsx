@@ -2,7 +2,7 @@ import { ValidTenantId } from "@/../convex/lib/constants";
 
 interface PortalLayoutProps {
   children: React.ReactNode;
-  params: Promise<{ tenantId: ValidTenantId }>;
+  params: Promise<{ tenantId: string }>;
 }
 
 export default async function PortalLayout({
@@ -10,6 +10,9 @@ export default async function PortalLayout({
   params,
 }: PortalLayoutProps) {
   const { tenantId } = await params;
+  
+  // Validate tenantId is a valid tenant
+  const validTenantId = tenantId as ValidTenantId;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -22,7 +25,7 @@ export default async function PortalLayout({
               </h1>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-500">Tenant: {tenantId}</span>
+              <span className="text-sm text-gray-500">Tenant: {validTenantId}</span>
             </div>
           </div>
         </div>
@@ -32,19 +35,19 @@ export default async function PortalLayout({
         <nav className="mb-8">
           <div className="flex space-x-8">
             <a
-              href={`/portal/${tenantId}`}
+              href={`/portal/${validTenantId}`}
               className="text-blue-600 hover:text-blue-800 font-medium"
             >
               Dashboard
             </a>
             <a
-              href={`/portal/${tenantId}/products`}
+              href={`/portal/${validTenantId}/products`}
               className="text-blue-600 hover:text-blue-800 font-medium"
             >
               Products
             </a>
             <a
-              href={`/portal/${tenantId}/categories`}
+              href={`/portal/${validTenantId}/categories`}
               className="text-blue-600 hover:text-blue-800 font-medium"
             >
               Categories
