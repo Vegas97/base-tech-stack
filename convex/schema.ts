@@ -161,13 +161,13 @@ export default defineSchema({
 
   // Products table - main business entity
   products: defineTable({
+    tenantId: v.string(), // Tenant subdomain
     name: v.string(),
     price: v.optional(v.number()),
     cost: v.optional(v.number()),
     description: v.string(),
     category: v.string(),
     internalNotes: v.optional(v.string()),
-    tenantId: v.string(), // Tenant subdomain
     createdAt: v.number(),
     updatedAt: v.number(),
     isActive: v.boolean(),
