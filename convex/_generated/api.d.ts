@@ -13,6 +13,8 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as entities_products from "../entities/products.js";
+import type * as entities_users from "../entities/users.js";
 import type * as lib_audit_utils from "../lib/audit_utils.js";
 import type * as lib_constants from "../lib/constants.js";
 import type * as lib_field_permissions from "../lib/field_permissions.js";
@@ -30,6 +32,8 @@ import type * as lib_validators from "../lib/validators.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  "entities/products": typeof entities_products;
+  "entities/users": typeof entities_users;
   "lib/audit_utils": typeof lib_audit_utils;
   "lib/constants": typeof lib_constants;
   "lib/field_permissions": typeof lib_field_permissions;

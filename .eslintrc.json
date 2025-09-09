@@ -1,0 +1,34 @@
+{
+  "extends": ["next/core-web-vitals"],
+  "rules": {
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          {
+            "group": ["**/services/**/client"],
+            "message": "Client services cannot be imported in API routes or server actions"
+          }
+        ]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["src/app/api/**/*.ts", "src/actions/**/*.ts"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["convex/react", "**/client.ts", "**/client/**"],
+                "message": "React hooks and client code forbidden in server contexts"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
