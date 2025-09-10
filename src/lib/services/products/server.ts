@@ -15,7 +15,7 @@ export interface ListProductsParams {
   tenantId: string;
   filters?: ProductFilters;
   sortBy?: "createdAt" | "relevance";
-  paginationOpts?: { numItems: number; cursor?: string };
+  paginationOpts?: { numItems: number; cursor: string | null };
 }
 
 export const productsServer = {

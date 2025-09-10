@@ -74,7 +74,9 @@ export default clerkMiddleware((auth, req: NextRequest) => {
           console.log(
             `[Middleware] Rewriting portal ${tenantId} to: ${url.pathname}`
           );
-          return NextResponse.rewrite(url);
+          const response = NextResponse.rewrite(url);
+          response.headers.set('x-tenant-id', tenantId);
+          return response;
         }
       } else if (tenantConfig.type === TenantType.STANDALONE) {
         // Standalone tenants with auth (admin, integrators, validators, testers) - route to /{tenantId}
@@ -83,7 +85,9 @@ export default clerkMiddleware((auth, req: NextRequest) => {
           console.log(
             `[Middleware] Rewriting auth tenant ${tenantId} to: ${url.pathname}`
           );
-          return NextResponse.rewrite(url);
+          const response = NextResponse.rewrite(url);
+          response.headers.set('x-tenant-id', tenantId);
+          return response;
         }
       } else if (tenantConfig.type === TenantType.PUBLIC_STANDALONE) {
         // Public standalone tenants without auth (status) - route to /{tenantId}
@@ -92,7 +96,9 @@ export default clerkMiddleware((auth, req: NextRequest) => {
           console.log(
             `[Middleware] Rewriting public tenant ${tenantId} to: ${url.pathname}`
           );
-          return NextResponse.rewrite(url);
+          const response = NextResponse.rewrite(url);
+          response.headers.set('x-tenant-id', tenantId);
+          return response;
         }
       } else if (tenantConfig.type === TenantType.API_ONLY) {
         // API-only tenants (api, external-api) - route to /api/{tenantId}
@@ -101,7 +107,9 @@ export default clerkMiddleware((auth, req: NextRequest) => {
           console.log(
             `[Middleware] Rewriting API tenant ${tenantId} to: ${url.pathname}`
           );
-          return NextResponse.rewrite(url);
+          const response = NextResponse.rewrite(url);
+          response.headers.set('x-tenant-id', tenantId);
+          return response;
         }
       }
     }

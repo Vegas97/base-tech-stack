@@ -4,6 +4,7 @@ import {
   ProductFilters,
   CreateProductInput,
 } from "@/../convex/entities/products";
+import { extractTenantFromRequest } from "@/lib/utils/tenant-server";
 
 /**
  * GET /api/v1/products
@@ -13,15 +14,8 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
 
-    // Extract
-    const tenantId = searchParams.get("tenantId");
-
-    if (!tenantId) {
-      return NextResponse.json(
-        { error: "tenantId is required" },
-        { status: 400 }
-      );
-    }
+    // Extract tenant from middleware header
+    const tenantId = extractTenantFromRequest(request);
 
     // Extract query parameters
     const category = searchParams.get("category");
@@ -41,7 +35,7 @@ export async function GET(request: NextRequest) {
     // Build pagination options
     const paginationOpts = {
       numItems: numItems ? parseInt(numItems) : 20,
-      ...(cursor && { cursor }),
+      cursor: cursor || null,
     };
 
     const result = await productsServer.list({
@@ -68,11 +62,14 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
+    // Extract tenant from middleware header
+    const tenantId = extractTenantFromRequest(request);
+
     // Validate required fields
-    const { name, description, category, tenantId, price, cost, internalNotes } = body;
-    if (!name || !description || !category || !tenantId) {
+    const { name, description, category, price, cost, internalNotes } = body;
+    if (!name || !description || !category) {
       return NextResponse.json(
-        { error: "name, description, category, and tenantId are required" },
+        { error: "name, description, and category are required" },
         { status: 400 }
       );
     }
