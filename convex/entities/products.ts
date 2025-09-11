@@ -28,7 +28,30 @@ export const productFiltersValidator = v.object({
   category: v.optional(v.string()),
   minPrice: v.optional(v.number()),
   maxPrice: v.optional(v.number()),
-  search: v.optional(v.string()),
+});
+
+// Export filter keys dynamically
+export const productFilterKeys = Object.keys(
+  productFiltersValidator.fields
+) as (keyof ProductFilters)[];
+
+// Define available indexes (must match schema.ts)
+export const productIndexes = {
+  by_tenant_active: ["tenantId", "isActive"],
+  // Add more as defined in schema: by_tenant_price, by_tenant_category
+} as const;
+
+// Map sortable fields to indexes
+export const productSortableFields = {
+  _creationTime: null, // No index needed
+  // price: "by_tenant_price", // Only if index exists
+  // category: "by_tenant_category", // Only if index exists
+} as const;
+
+// Generic sort validator
+export const sortValidator = v.object({
+  field: v.optional(v.string()),
+  direction: v.optional(v.union(v.literal("asc"), v.literal("desc")))
 });
 
 export const createProductInputValidator = v.object({
@@ -54,28 +77,38 @@ export const updateProductInputValidator = v.object({
 export type ProductFilters = Infer<typeof productFiltersValidator>;
 export type CreateProductInput = Infer<typeof createProductInputValidator>;
 export type UpdateProductInput = Infer<typeof updateProductInputValidator>;
+export type SortParams = Infer<typeof sortValidator>;
 
 // Validation helpers
 export type ValidProductField = keyof Doc<"products">;
 
-// Unified list/search function with filters and sorting
+// Unified list function with filters and sorting
 export const listProducts = query({
   args: {
     paginationOpts: paginationOptsValidator,
     tenantId: v.string(),
     filters: v.optional(productFiltersValidator),
-    sortBy: v.optional(v.union(v.literal("createdAt"), v.literal("relevance"))),
+    sort: v.optional(sortValidator),
   },
   handler: async (ctx, args) => {
-    const { tenantId, filters = {}, sortBy = "createdAt" } = args;
-
+    const { tenantId, filters = {}, sort = {} } = args;
+    
+    // Determine sort field and direction
+    const sortField = sort.field || "_creationTime";
+    const sortDirection = sort.direction || "desc";
+    
+    // Check if field is sortable
+    const indexName = productSortableFields[sortField as keyof typeof productSortableFields];
+    
+    // For now, always use the standard index since we don't have other indexes defined
+    // When you add more indexes in schema.ts, you can implement index-based sorting
     let query = ctx.db
       .query("products")
       .withIndex("by_tenant_active", (q) =>
         q.eq("tenantId", tenantId).eq("isActive", true)
       );
 
-    // Apply filters before pagination for better performance
+    // Apply filters (Convex handles type conversion)
     if (filters.category) {
       query = query.filter((q) =>
         q.eq(q.field(ProductFields.category), filters.category)
@@ -94,49 +127,11 @@ export const listProducts = query({
       );
     }
 
-    let baseQuery = query.order("desc");
+    // Apply ordering
+    const orderedQuery = query.order(sortDirection);
 
-    // Handle search with relevance sorting or regular listing
-    if (filters.search) {
-      // For search, collect and filter in memory for text matching
-      const allProducts = await baseQuery.collect();
-      const searchTerm = filters.search.toLowerCase();
-      let filteredProducts = allProducts.filter(
-        (p) =>
-          p.name.toLowerCase().includes(searchTerm) ||
-          p.description.toLowerCase().includes(searchTerm) ||
-          p.category.toLowerCase().includes(searchTerm)
-      );
-
-      // Apply relevance sorting when search is used
-      if (sortBy === "relevance" || (filters.search && !sortBy)) {
-        filteredProducts.sort((a, b) => {
-          const aNameMatch = a.name.toLowerCase().includes(searchTerm);
-          const bNameMatch = b.name.toLowerCase().includes(searchTerm);
-
-          if (aNameMatch && !bNameMatch) return -1;
-          if (!aNameMatch && bNameMatch) return 1;
-
-          return b.createdAt - a.createdAt;
-        });
-      }
-
-      // Manual pagination for search results
-      const { numItems, cursor } = args.paginationOpts;
-      const startIndex = cursor ? parseInt(cursor) : 0;
-      const endIndex = startIndex + numItems;
-      const page = filteredProducts.slice(startIndex, endIndex);
-
-      return {
-        page,
-        isDone: endIndex >= filteredProducts.length,
-        continueCursor:
-          endIndex < filteredProducts.length ? endIndex.toString() : undefined,
-      };
-    }
-
-    // Standard Convex pagination for non-search queries
-    return await baseQuery.paginate(args.paginationOpts);
+    // Always use Convex's built-in pagination
+    return await orderedQuery.paginate(args.paginationOpts);
   },
 });
 

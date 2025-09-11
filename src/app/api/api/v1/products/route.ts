@@ -3,8 +3,14 @@ import { productsServer } from "@/lib/services/products/server";
 import {
   ProductFilters,
   CreateProductInput,
+  productFilterKeys,
 } from "@/../convex/entities/products";
 import { extractTenantFromRequest } from "@/lib/utils/tenant-server";
+import { 
+  extractPaginationParams, 
+  extractSortParams, 
+  extractFiltersFromKeys 
+} from "@/lib/utils/api-params";
 
 /**
  * GET /api/v1/products
@@ -17,30 +23,15 @@ export async function GET(request: NextRequest) {
     // Extract tenant from middleware header
     const tenantId = extractTenantFromRequest(request);
 
-    // Extract query parameters
-    const category = searchParams.get("category");
-    const search = searchParams.get("search");
-    const minPrice = searchParams.get("minPrice");
-    const maxPrice = searchParams.get("maxPrice");
-    const numItems = searchParams.get("numItems");
-    const cursor = searchParams.get("cursor");
-
-    // Build filters
-    const filters: ProductFilters = {};
-    if (category) filters.category = category;
-    if (search) filters.search = search;
-    if (minPrice) filters.minPrice = parseFloat(minPrice);
-    if (maxPrice) filters.maxPrice = parseFloat(maxPrice);
-
-    // Build pagination options
-    const paginationOpts = {
-      numItems: numItems ? parseInt(numItems) : 20,
-      cursor: cursor || null,
-    };
+    // Extract all params using utilities - no hardcoding!
+    const paginationOpts = extractPaginationParams(searchParams);
+    const sort = extractSortParams(searchParams);
+    const filters = extractFiltersFromKeys(searchParams, productFilterKeys);
 
     const result = await productsServer.list({
       tenantId,
       filters,
+      sort,
       paginationOpts,
     });
 

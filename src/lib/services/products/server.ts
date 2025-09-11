@@ -8,13 +8,14 @@ import type {
   CreateProductInput,
   UpdateProductInput,
   ProductFilters,
+  SortParams,
 } from "@/../convex/entities/products";
 
 // Define ListProductsParams based on the listProducts query
 export interface ListProductsParams {
   tenantId: string;
   filters?: ProductFilters;
-  sortBy?: "createdAt" | "relevance";
+  sort?: SortParams;
   paginationOpts?: { numItems: number; cursor: string | null };
 }
 
