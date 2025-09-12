@@ -16,7 +16,6 @@ export const productsClient = {
     return BaseClientService.usePaginatedQueryWithBase(
       api.entities.products.listProducts,
       params,
-      { initialNumItems: 20 },
       { tenantId: params.tenantId, operation: "products.list" }
     );
   },

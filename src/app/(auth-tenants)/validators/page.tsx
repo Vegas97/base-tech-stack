@@ -13,29 +13,29 @@ export default function ValidatorsDashboard() {
           </header>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-orange-500">
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+            <div className="bg-card rounded-lg shadow-md p-6 border-l-4 border-orange-500">
+              <h3 className="text-xl font-semibold text-foreground mb-2">
                 Validation Rules
               </h3>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Configure data validation rules
               </p>
             </div>
 
-            <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-orange-500">
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+            <div className="bg-card rounded-lg shadow-md p-6 border-l-4 border-orange-500">
+              <h3 className="text-xl font-semibold text-foreground mb-2">
                 Quality Reports
               </h3>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Review data quality metrics
               </p>
             </div>
 
-            <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-orange-500">
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+            <div className="bg-card rounded-lg shadow-md p-6 border-l-4 border-orange-500">
+              <h3 className="text-xl font-semibold text-foreground mb-2">
                 Error Logs
               </h3>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Monitor validation errors
               </p>
             </div>

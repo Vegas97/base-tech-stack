@@ -13,30 +13,30 @@ export default function ScubaDivingPortal() {
           </header>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+            <div className="bg-card rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+              <h3 className="text-xl font-semibold text-foreground mb-2">
                 Diving Equipment
               </h3>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Browse our premium diving gear
               </p>
             </div>
 
-            <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+            <div className="bg-card rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+              <h3 className="text-xl font-semibold text-foreground mb-2">
                 Dive Locations
               </h3>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Discover amazing dive sites worldwide
               </p>
             </div>
 
-            <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+            <div className="bg-card rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+              <h3 className="text-xl font-semibold text-foreground mb-2">
                 Training Courses
               </h3>
-              <p className="text-gray-600">
-                Get certified with our expert instructors
+              <p className="text-muted-foreground">
+                Get certified with professional instructors
               </p>
             </div>
           </div>

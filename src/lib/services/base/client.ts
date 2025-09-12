@@ -31,10 +31,11 @@ export class BaseClientService {
   static usePaginatedQueryWithBase<TArgs, TResult>(
     queryFn: any,
     args: TArgs,
-    options: { initialNumItems: number },
     context: ServiceContext
   ) {
-    const result = usePaginatedQuery(queryFn, args as any, options);
+    // Extract numItems from args.paginationOpts and forward to React hook
+    const numItems = (args as any)?.paginationOpts?.numItems || 20;
+    const result = usePaginatedQuery(queryFn, args as any, { initialNumItems: numItems });
 
     // Log paginated query execution on client
     if (typeof window !== "undefined" && result.results !== undefined) {
