@@ -169,60 +169,70 @@ export const TENANT_CONFIG = {
     subdomain: "scubadiving",
     primaryColor: "#0066CC",
     type: TenantType.PORTAL,
+    routePrefix: "/portal/scubadiving",
   },
   [ValidTenantId.SKYDIVING]: {
     name: "Skydiving Portal",
     subdomain: "skydiving",
     primaryColor: "#FF6600",
     type: TenantType.PORTAL,
+    routePrefix: "/portal/skydiving",
   },
   [ValidTenantId.ADMIN]: {
     name: "Admin Portal",
     subdomain: "admin",
     primaryColor: "#333333",
     type: TenantType.STANDALONE,
+    routePrefix: "/admin",
   },
   [ValidTenantId.INTEGRATORS]: {
     name: "Integrators Portal",
     subdomain: "integrators",
     primaryColor: "#4CAF50",
     type: TenantType.STANDALONE,
+    routePrefix: "/integrators",
   },
   [ValidTenantId.VALIDATORS]: {
     name: "Validators Portal",
     subdomain: "validators",
     primaryColor: "#FF9800",
     type: TenantType.STANDALONE,
+    routePrefix: "/validators",
   },
   [ValidTenantId.TESTERS]: {
     name: "Testers Portal",
     subdomain: "testers",
     primaryColor: "#9C27B0",
     type: TenantType.STANDALONE,
+    routePrefix: "/testers",
   },
   [ValidTenantId.STATUS]: {
     name: "Status Page",
     subdomain: "status",
     primaryColor: "#10B981",
     type: TenantType.PUBLIC_STANDALONE,
+    routePrefix: "/status",
   },
   [ValidTenantId.MAIN]: {
     name: "Main Site",
     subdomain: "main",
     primaryColor: "#6366F1",
     type: TenantType.PUBLIC_STANDALONE,
+    routePrefix: "/main",
   },
   [ValidTenantId.API]: {
     name: "API Services",
     subdomain: "api",
     primaryColor: "#059669",
     type: TenantType.API_ONLY,
+    routePrefix: "/api/api",
   },
   [ValidTenantId.EXTERNAL_API]: {
     name: "External API Services",
     subdomain: "external-api",
     primaryColor: "#DC2626",
     type: TenantType.API_ONLY,
+    routePrefix: "/api/external-api",
   },
 } as const satisfies Record<
   ValidTenantId,
@@ -231,6 +241,7 @@ export const TENANT_CONFIG = {
     subdomain: string;
     primaryColor: string;
     type: TenantType;
+    routePrefix: string;
   }
 >;
 

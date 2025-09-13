@@ -67,51 +67,14 @@ export default clerkMiddleware((auth, req: NextRequest) => {
     );
 
     if (!isSystemRoute) {
-      if (tenantConfig.type === TenantType.PORTAL) {
-        // Portal tenants (scubadiving, skydiving) - route to /portal/{tenantId}
-        if (!url.pathname.startsWith("/portal")) {
-          url.pathname = `/portal/${tenantId}${url.pathname}`;
-          console.log(
-            `[Middleware] Rewriting portal ${tenantId} to: ${url.pathname}`
-          );
-          const response = NextResponse.rewrite(url);
-          response.headers.set('x-tenant-id', tenantId);
-          return response;
-        }
-      } else if (tenantConfig.type === TenantType.STANDALONE) {
-        // Standalone tenants with auth (admin, integrators, validators, testers) - route to /{tenantId}
-        if (!url.pathname.startsWith(`/${tenantId}`)) {
-          url.pathname = `/${tenantId}${url.pathname}`;
-          console.log(
-            `[Middleware] Rewriting auth tenant ${tenantId} to: ${url.pathname}`
-          );
-          const response = NextResponse.rewrite(url);
-          response.headers.set('x-tenant-id', tenantId);
-          return response;
-        }
-      } else if (tenantConfig.type === TenantType.PUBLIC_STANDALONE) {
-        // Public standalone tenants without auth (status) - route to /{tenantId}
-        if (!url.pathname.startsWith(`/${tenantId}`)) {
-          url.pathname = `/${tenantId}${url.pathname}`;
-          console.log(
-            `[Middleware] Rewriting public tenant ${tenantId} to: ${url.pathname}`
-          );
-          const response = NextResponse.rewrite(url);
-          response.headers.set('x-tenant-id', tenantId);
-          return response;
-        }
-      } else if (tenantConfig.type === TenantType.API_ONLY) {
-        // API-only tenants (api, external-api) - route to /api/{tenantId}
-        if (!url.pathname.startsWith(`/api/${tenantId}`)) {
-          url.pathname = `/api/${tenantId}${url.pathname}`;
-          console.log(
-            `[Middleware] Rewriting API tenant ${tenantId} to: ${url.pathname}`
-          );
-          const response = NextResponse.rewrite(url);
-          response.headers.set('x-tenant-id', tenantId);
-          return response;
-        }
-      }
+      // Use automated routing prefix from tenant config
+      url.pathname = `${tenantConfig.routePrefix}${url.pathname}`;
+      console.log(
+        `[Middleware] Rewriting ${tenantConfig.type} tenant ${tenantId} to: ${url.pathname}`
+      );
+      const response = NextResponse.rewrite(url);
+      response.headers.set('x-tenant-id', tenantId);
+      return response;
     }
   }
 
