@@ -2,17 +2,26 @@
 // React hooks imports
 
 import { api } from "@/../convex/_generated/api";
-import { BaseClientService } from "@/lib/services/base/client";
+import {
+  BaseClientService,
+  BasePaginatedParams,
+} from "@/lib/services/base/client";
 // Import types directly from Convex entities
 import type {
   CreateProductInput,
   UpdateProductInput,
   ProductFilters,
+  SortParams,
 } from "@/../convex/entities/products";
-import type { ListProductsParams } from "./server";
+
+// Client-specific interface extending base pagination
+interface ClientListProductsParams extends BasePaginatedParams {
+  filters: ProductFilters;
+  sort?: SortParams;
+}
 
 export const productsClient = {
-  useList(params: ListProductsParams) {
+  useList(params: ClientListProductsParams) {
     return BaseClientService.usePaginatedQueryWithBase(
       api.entities.products.listProducts,
       params,

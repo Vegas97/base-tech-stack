@@ -20,7 +20,7 @@ export function ProductsAgGrid({ tenantId }: ProductsAgGridProps) {
     tenantId,
     filters: {},
     sort: { field: "_creationTime", direction: "desc" },
-    paginationOpts: { numItems: 1, cursor: null },
+    initialNumItems: 1,
   });
 
   // Debug logging

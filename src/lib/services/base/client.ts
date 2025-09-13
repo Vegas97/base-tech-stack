@@ -4,6 +4,12 @@
 import { useQuery, useMutation, usePaginatedQuery } from "convex/react";
 import { BaseUtils, ServiceContext, ServiceError } from "./utils";
 
+// Base interface for paginated queries
+export interface BasePaginatedParams {
+  tenantId: string;
+  initialNumItems: number;
+}
+
 export class BaseClientService {
   // ========================================
   // CLIENT-SIDE METHODS (React Components)
@@ -33,9 +39,11 @@ export class BaseClientService {
     args: TArgs,
     context: ServiceContext
   ) {
-    // Extract numItems from args.paginationOpts and forward to React hook
-    const numItems = (args as any)?.paginationOpts?.numItems || 20;
-    const result = usePaginatedQuery(queryFn, args as any, { initialNumItems: numItems });
+    // Extract initialNumItems from params or use default
+    const initialNumItems = (args as any)?.initialNumItems || 20;
+    // Remove initialNumItems from args before passing to Convex
+    const { initialNumItems: _, ...convexArgs } = args as any;
+    const result = usePaginatedQuery(queryFn, convexArgs, { initialNumItems });
 
     // Log paginated query execution on client
     if (typeof window !== "undefined" && result.results !== undefined) {
@@ -69,7 +77,9 @@ export class BaseClientService {
           context,
           error
         );
-        BaseUtils.log("error", context, "Mutation failed", { error: enhancedError });
+        BaseUtils.log("error", context, "Mutation failed", {
+          error: enhancedError,
+        });
         throw enhancedError;
       }
     };
