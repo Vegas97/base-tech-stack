@@ -3,20 +3,27 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Settings, Database, Users, BarChart3, Package, Menu, X } from "lucide-react";
+import {
+  Settings,
+  Database,
+  Users,
+  BarChart3,
+  Package,
+  Menu,
+  X,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
-
 
 export default function AdminLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   // Load sidebar state from localStorage on mount
   useEffect(() => {
-    const savedState = localStorage.getItem('admin-sidebar-open');
+    const savedState = localStorage.getItem("admin-sidebar-open");
     if (savedState !== null) {
       setSidebarOpen(JSON.parse(savedState));
     }
@@ -24,7 +31,7 @@ export default function AdminLayout({
 
   // Save sidebar state to localStorage when it changes
   useEffect(() => {
-    localStorage.setItem('admin-sidebar-open', JSON.stringify(sidebarOpen));
+    localStorage.setItem("admin-sidebar-open", JSON.stringify(sidebarOpen));
   }, [sidebarOpen]);
 
   const toggleSidebar = () => {
@@ -45,15 +52,19 @@ export default function AdminLayout({
                 onClick={toggleSidebar}
                 className="mr-4"
               >
-                {sidebarOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+                {sidebarOpen ? (
+                  <X className="h-4 w-4" />
+                ) : (
+                  <Menu className="h-4 w-4" />
+                )}
               </Button>
-              
+
               {/* Logo/Brand */}
-              <Link href="/admin" className="text-xl font-bold text-foreground">
+              <Link href="/" className="text-xl font-bold text-foreground">
                 Admin Panel
               </Link>
             </div>
-            
+
             {/* Right side actions */}
             <div className="flex items-center">
               <Button variant="ghost" size="sm">
@@ -63,40 +74,42 @@ export default function AdminLayout({
           </div>
         </div>
       </nav>
-      
+
       <div className="flex">
         {/* Sidebar */}
-        <aside className={cn(
-          "bg-card border-r transition-all duration-300 ease-in-out",
-          sidebarOpen ? "w-64" : "w-0 overflow-hidden"
-        )}>
+        <aside
+          className={cn(
+            "bg-card border-r transition-all duration-300 ease-in-out",
+            sidebarOpen ? "w-64" : "w-0 overflow-hidden"
+          )}
+        >
           <nav className="p-4 space-y-2">
             <Link
-              href="/admin"
+              href=""
               className="flex items-center px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
             >
               <BarChart3 className="h-4 w-4 mr-3" />
               Dashboard
             </Link>
-            
+
             <Link
-              href="/admin/products"
+              href="/products"
               className="flex items-center px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
             >
               <Package className="h-4 w-4 mr-3" />
               Products
             </Link>
-            
+
             <Link
-              href="/admin/users"
+              href="/users"
               className="flex items-center px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
             >
               <Users className="h-4 w-4 mr-3" />
               Users
             </Link>
-            
+
             <Link
-              href="/admin/direct-convex-calls/products"
+              href="/direct-convex-calls/products"
               className="flex items-center px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
             >
               <Database className="h-4 w-4 mr-3" />
@@ -104,15 +117,17 @@ export default function AdminLayout({
             </Link>
           </nav>
         </aside>
-        
+
         {/* Main Content */}
-        <main className={cn(
-          "flex-1 transition-all duration-300 ease-in-out",
-          "py-6 px-4 sm:px-6 lg:px-8"
-        )}>
+        <main
+          className={cn(
+            "flex-1 transition-all duration-300 ease-in-out",
+            "py-6 px-4 sm:px-6 lg:px-8"
+          )}
+        >
           {children}
         </main>
       </div>
     </div>
-  )
+  );
 }
